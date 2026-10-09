@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jujutsu Kaisen: Curse Life</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel-2: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #f59e0b;
+      --danger: #ef4444;
+      --good: #22c55e;
+      --purple: #a78bfa;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #020817 0%, #111827 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .game {
+      max-width: 1100px;
+      width: 100%;
+      background: rgba(15, 23, 42, 0.92);
+      border: 2px solid rgba(167, 139, 250, 0.5);
+      border-radius: 18px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+      overflow: hidden;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(17, 24, 39, 0.95);
+      padding: 18px 22px;
+      border-bottom: 2px solid rgba(167, 139, 250, 0.35);
+    }
+
+    .title {
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: #f8fafc;
+      letter-spacing: 1px;
+    }
+
+    .status-pill {
+      background: rgba(245, 158, 11, 0.18);
+      border: 1px solid rgba(245, 158, 11, 0.5);
+      color: #fbbf24;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-weight: bold;
+    }
+
+    .main {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: 700px;
+    }
+
+    .sidebar {
+      background: #0b1220;
+      border-right: 2px solid rgba(167, 139, 250, 0.25);
+      padding: 20px 16px;
+    }
+
+    .section {
+      margin-bottom: 20px;
+    }
+
+    .section h3 {
+      font-size: 0.9rem;
+      margin: 0 0 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .stat-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .stat {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(31, 41, 55, 0.8);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 0.96rem;
+      border: 1px solid rgba(148, 163, 184, 0.15);
+    }
+
+    .stat span:first-child {
+      color: var(--muted);
+    }
+
+    .content {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .panel {
+      background: rgba(17, 24, 39, 0.92);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .character-box {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .character-name {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin: 0 0 6px;
+    }
+
+    .character-sub {
+      color: var(--muted);
+      margin: 0;
+      font-size: 0.95rem;
+    }
+
+    .badge {
+      background: rgba(168, 85, 247, 0.18);
+      border: 1px solid rgba(168, 85, 247, 0.6);
+      color: #d8b4fe;
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(140px, 1fr));
+      gap: 12px;
+    }
+
+    button {
+      background: linear-gradient(180deg, #1f2937, #111827);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      color: var(--text);
+      padding: 12px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+      font-size: 0.96rem;
+      font-weight: bold;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      border-color: rgba(245, 158, 11, 0.8);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .danger {
+      border-color: rgba(239, 68, 68, 0.8);
+    }
+
+    .good {
+      border-color: rgba(34, 197, 94, 0.8);
+    }
+
+    .story {
+      min-height: 220px;
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: #e2e8f0;
+    }
+
+    .story strong {
+      color: #fbbf24;
+    }
+
+    .log {
+      max-height: 220px;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 8px;
+    }
+
+    .log-entry {
+      background: rgba(31, 41, 55, 0.7);
+      border-left: 3px solid var(--purple);
+      padding: 8px 10px;
+      border-radius: 8px;
+      color: #e5e7eb;
+      font-size: 0.95rem;
+    }
+
+    .log-entry.good {
+      border-left-color: var(--good);
+    }
+
+    .log-entry.bad {
+      border-left-color: var(--danger);
+    }
+
+    /* Combat Styles */
+    .hidden { display: none !important; }
+
+    .combat-arena {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .combatant {
+      background: rgba(31, 41, 55, 0.9);
+      border: 2px solid rgba(167, 139, 250, 0.4);
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    .combatant.player {
+      border-color: rgba(34, 197, 94, 0.6);
+    }
+
+    .combatant.enemy {
+      border-color: rgba(239, 68, 68, 0.6);
+    }
+
+    .combatant-name {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .health-bar, .resource-bar {
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 8px;
+      height: 24px;
+      overflow: hidden;
+      margin-bottom: 8px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+    }
+
+    .health-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #22c55e, #16a34a);
+      transition: width 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+
+    .stamina-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #f59e0b, #d97706);
+      transition: width 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+
+    .cursed-energy-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #a78bfa, #7c3aed);
+      transition: width 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+
+    .resource-label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .combat-log {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 12px;
+      max-height: 180px;
+      overflow-y: auto;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-top: 16px;
+    }
+
+    .combat-log-entry {
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+    }
+
+    .combat-log-entry:last-child {
+      border-bottom: none;
+    }
+
+    .combat-log-entry.player {
+      color: #4ade80;
+    }
+
+    .combat-log-entry.enemy {
+      color: #f87171;
+    }
+
+    .combat-log-entry.neutral {
+      color: #93c5fd;
+    }
+
+    .moves-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .move-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 12px;
+      background: rgba(31, 41, 55, 0.9);
+      border: 2px solid rgba(148, 163, 184, 0.3);
+      color: var(--text);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-size: 0.9rem;
+      text-align: left;
+    }
+
+    .move-btn:hover:not(:disabled) {
+      border-color: rgba(34, 197, 94, 0.8);
+      transform: translateY(-2px);
+    }
+
+    .move-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .move-name {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .move-cost {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .turn-indicator {
+      background: rgba(168, 85, 247, 0.18);
+      border: 1px solid rgba(168, 85, 247, 0.6);
+      color: #d8b4fe;
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-weight: bold;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .battle-result {
+      background: rgba(245, 158, 11, 0.18);
+      border: 2px solid rgba(245, 158, 11, 0.5);
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .battle-result h2 {
+      margin: 0 0 12px;
+      font-size: 1.8rem;
+    }
+
+    .battle-result .good {
+      color: var(--good);
+    }
+
+    .battle-result .bad {
+      color: var(--danger);
+    }
+
+    @media (max-width: 900px) {
+      .main { grid-template-columns: 1fr; }
+      .sidebar { border-right: none; border-bottom: 2px solid rgba(167, 139, 250, 0.25); }
+      .actions { grid-template-columns: repeat(2, minmax(120px, 1fr)); }
+      .combat-arena { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="game">
+    <div class="topbar">
+      <div class="title">Jujutsu Kaisen: Curse Life</div>
+      <div class="status-pill" id="statusLabel">School Life</div>
+    </div>
+
+    <div class="main">
+      <aside class="sidebar">
+        <div class="section">
+          <h3>Stats</h3>
+          <div class="stat-list">
+            <div class="stat"><span>Age</span><strong id="age">15</strong></div>
+            <div class="stat"><span>Health</span><strong id="health">90</strong></div>
+            <div class="stat"><span>Energy</span><strong id="energy">80</strong></div>
+            <div class="stat"><span>Cursed Energy</span><strong id="curseEnergy">65</strong></div>
+            <div class="stat"><span>Money</span><strong id="money">120</strong></div>
+            <div class="stat"><span>Grade</span><strong id="grade">C</strong></div>
+            <div class="stat"><span>Reputation</span><strong id="reputation">0</strong></div>
+            <div class="stat"><span>Fear</span><strong id="fear">20</strong></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Traits</h3>
+          <div class="stat-list">
+            <div class="stat"><span>School</span><strong id="school">Tokyo Jujutsu High</strong></div>
+            <div class="stat"><span>Specialty</span><strong id="specialty">Divergent Fist</strong></div>
+            <div class="stat"><span>Motivation</span><strong id="motivation">High</strong></div>
+          </div>
+        </div>
+      </aside>
+
+      <div class="content">
+        <!-- Main Game Screen -->
+        <div id="mainScreen">
+          <div class="panel character-box">
+            <div>
+              <h2 class="character-name" id="playerName">Yuji Itadori</h2>
+              <p class="character-sub" id="bio">A first-year sorcerer chasing purpose and survival.</p>
+            </div>
+            <div class="badge" id="rankBadge">First-Year</div>
+          </div>
+
+          <div class="panel">
+            <div class="actions">
+              <button class="good" onclick="train()">Train</button>
+              <button class="good" onclick="study()">Study</button>
+              <button class="good" onclick="rest()">Rest</button>
+              <button onclick="eat()">Eat</button>
+              <button onclick="socialize()">Socialize</button>
+              <button class="good" onclick="startMission()">Mission</button>
+              <button class="danger" onclick="startFight()">Fight</button>
+              <button onclick="shop()">Shop</button>
+            </div>
+          </div>
+
+          <div class="panel story" id="storyText">
+            Your journey begins at Tokyo Jujutsu High. A new curse user lurks in the shadows, and your destiny is about to awaken.
+          </div>
+
+          <div class="panel">
+            <h3 style="margin-top:0; margin-bottom:12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px;">Life Log</h3>
+            <div class="log" id="log"></div>
+          </div>
+        </div>
+
+        <!-- Combat Screen -->
+        <div id="combatScreen" class="hidden">
+          <div class="turn-indicator" id="turnIndicator">Player Turn</div>
+
+          <div class="battle-result hidden" id="battleResult"></div>
+
+          <div class="combat-arena">
+            <div class="combatant player">
+              <div class="combatant-name" id="playerCombatName">Yuji Itadori</div>
+              <div class="resource-label">Health</div>
+              <div class="health-bar">
+                <div class="health-fill" id="playerHealthBar" style="width: 100%">
+                  <span id="playerHealthText">100/100</span>
+                </div>
+              </div>
+
+              <div class="resource-label">Stamina</div>
+              <div class="resource-bar">
+                <div class="stamina-fill" id="playerStaminaBar" style="width: 100%">
+                  <span id="playerStaminaText">100/100</span>
+                </div>
+              </div>
+
+              <div class="resource-label">Cursed Energy</div>
+              <div class="resource-bar">
+                <div class="cursed-energy-fill" id="playerCEBar" style="width: 100%">
+                  <span id="playerCEText">100/100</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="combatant enemy">
+              <div class="combatant-name" id="enemyCombatName">Curse</div>
+              <div class="resource-label">Health</div>
+              <div class="health-bar">
+                <div class="health-fill" id="enemyHealthBar" style="width: 100%">
+                  <span id="enemyHealthText">100/100</span>
+                </div>
+              </div>
+
+              <div class="resource-label">Stamina</div>
+              <div class="resource-bar">
+                <div class="stamina-fill" id="enemyStaminaBar" style="width: 100%">
+                  <span id="enemyStaminaText">100/100</span>
+                </div>
+              </div>
+
+              <div class="resource-label">Cursed Energy</div>
+              <div class="resource-bar">
+                <div class="cursed-energy-fill" id="enemyCEBar" style="width: 100%">
+                  <span id="enemyCEText">100/100</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3 style="margin-top:0; margin-bottom:12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px;">Available Moves</h3>
+            <div class="moves-grid" id="movesGrid"></div>
+          </div>
+
+          <div class="panel">
+            <div class="combat-log" id="combatLog"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============ STATE ============
+    const state = {
+      age: 15,
+      health: 90,
+      energy: 80,
+      curseEnergy: 65,
+      money: 120,
+      grade: "C",
+      reputation: 0,
+      fear: 20,
+      school: "Tokyo Jujutsu High",
+      specialty: "Divergent Fist",
+      motivation: "High",
+      name: "Yuji Itadori",
+      bio: "A first-year sorcerer chasing purpose and survival.",
+      status: "School Life",
+      rank: "First-Year"
+    };
+
+    // ============ COMBAT STATE ============
+    let combat = null;
+
+    // ============ MOVES DATABASE ============
+    const movesDB = {
+      divergentFist: {
+        name: "Divergent Fist",
+        description: "A powerful hand-to-hand strike",
+        staminaCost: 15,
+        cursedEnergyCost: 10,
+        damage: (stats) => stats.power * 1.2 + 8,
+        accuracy: 0.95
+      },
+      shadowSlash: {
+        name: "Shadow Slash",
+        description: "Channel cursed energy into a cutting strike",
+        staminaCost: 20,
+        cursedEnergyCost: 25,
+        damage: (stats) => stats.power * 1.8 + 12,
+        accuracy: 0.85
+      },
+      dominantBlow: {
+        name: "Dominant Blow",
+        description: "A devastating combo attack",
+        staminaCost: 25,
+        cursedEnergyCost: 35,
+        damage: (stats) => stats.power * 2.5 + 18,
+        accuracy: 0.75
+      },
+      defensiveStance: {
+        name: "Defensive Stance",
+        description: "Reduce damage taken this turn",
+        staminaCost: 8,
+        cursedEnergyCost: 5,
+        damage: () => 0,
+        accuracy: 1.0,
+        isDefensive: true,
+        defenseBonus: 0.4
+      },
+      recover: {
+        name: "Recover",
+        description: "Restore stamina and cursed energy",
+        staminaCost: 5,
+        cursedEnergyCost: 10,
+        damage: () => 0,
+        accuracy: 1.0,
+        isHealing: true,
+        healAmount: (stats) => stats.maxStamina * 0.5
+      },
+      powerBurst: {
+        name: "Power Burst",
+        description: "Sacrifice stamina for a massive attack",
+        staminaCost: 40,
+        cursedEnergyCost: 50,
+        damage: (stats) => stats.power * 3.2 + 25,
+        accuracy: 0.7
+      }
+    };
+
+    // ============ DOM ELEMENTS ============
+    const mainScreen = document.getElementById("mainScreen");
+    const combatScreen = document.getElementById("combatScreen");
+    const storyText = document.getElementById("storyText");
+    const logEl = document.getElementById("log");
+    const combatLogEl = document.getElementById("combatLog");
+    const movesGrid = document.getElementById("movesGrid");
+    const battleResult = document.getElementById("battleResult");
+    const turnIndicator = document.getElementById("turnIndicator");
+
+    // ============ UTILITY FUNCTIONS ============
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function addLog(message, type = "") {
+      const entry = document.createElement("div");
+      entry.className = "log-entry" + (type ? " " + type : "");
+      entry.textContent = message;
+      logEl.prepend(entry);
+    }
+
+    function addCombatLog(message, type = "neutral") {
+      const entry = document.createElement("div");
+      entry.className = "combat-log-entry " + type;
+      entry.textContent = message;
+      combatLogEl.prepend(entry);
+    }
+
+    function updateUI() {
+      document.getElementById("age").textContent = state.age;
+      document.getElementById("health").textContent = state.health;
+      document.getElementById("energy").textContent = state.energy;
+      document.getElementById("curseEnergy").textContent = state.curseEnergy;
+      document.getElementById("money").textContent = state.money;
+      document.getElementById("grade").textContent = state.grade;
+      document.getElementById("reputation").textContent = state.reputation;
+      document.getElementById("fear").textContent = state.fear;
+      document.getElementById("school").textContent = state.school;
+      document.getElementById("specialty").textContent = state.specialty;
+      document.getElementById("motivation").textContent = state.motivation;
+      document.getElementById("playerName").textContent = state.name;
+      document.getElementById("bio").textContent = state.bio;
+      document.getElementById("rankBadge").textContent = state.rank;
+      document.getElementById("statusLabel").textContent = state.status;
+    }
+
+    function checkLife() {
+      if (state.health <= 0) {
+        storyText.innerHTML = "<strong>Game Over.</strong> You were overwhelmed by a cursed spirit and your life ended before the next mission began.";
+        addLog("You collapsed from exhaustion and were unable to continue.", "bad");
+        disableActions();
+        return true;
+      }
+
+      if (state.age >= 23) {
+        storyText.innerHTML = "<strong>Ending.</strong> Your years as a sorcerer come to a close. You leave behind a legendary reputation and the memory of countless battles.";
+        addLog("Your story reaches its end. The curtain falls after years of sacrifice.", "good");
+        disableActions();
+        return true;
+      }
+
+      return false;
+    }
+
+    function disableActions() {
+      document.querySelectorAll(".actions button").forEach(btn => btn.disabled = true);
+    }
+
+    function randomFrom(list) {
+      return list[Math.floor(Math.random() * list.length)];
+    }
+
+    function story(msg) {
+      storyText.innerHTML = msg;
+    }
+
+    function nextYear() {
+      state.age += 1;
+      state.energy = clamp(state.energy + 10, 0, 100);
+      state.health = clamp(state.health + 5, 0, 100);
+      state.curseEnergy = clamp(state.curseEnergy + 4, 0, 100);
+      if (state.age >= 18) {
+        state.rank = state.age < 20 ? "University Sorcerer" : "Jujutsu Veteran";
+      } else if (state.age >= 16) {
+        state.rank = "Second-Year";
+      } else {
+        state.rank = "First-Year";
+      }
+
+      if (state.age % 2 === 0) {
+        state.grade = ["D", "C", "B", "A", "S"][Math.min(Math.floor(state.reputation / 15), 4)];
+      }
+    }
+
+    // ============ COMBAT SYSTEM ============
+    class CombatState {
+      constructor(playerName, enemyName, enemyGrade = "Grade 2") {
+        this.playerName = playerName;
+        this.enemyName = enemyName;
+        this.enemyGrade = enemyGrade;
+        this.turn = 0;
+        this.isPlayerTurn = true;
+        this.finished = false;
+        this.winner = null;
+
+        // Determine stats based on grade
+        const gradeMultiplier = {
+          "Small Curse": 0.6,
+          "Grade 2": 1.0,
+          "Grade 1": 1.6,
+          "Special Grade": 2.5
+        };
+
+        const mult = gradeMultiplier[enemyGrade] || 1.0;
+
+        this.player = {
+          maxHealth: 100,
+          health: 100,
+          maxStamina: 100,
+          stamina: 100,
+          maxCursedEnergy: 100,
+          cursedEnergy: 100,
+          power: 8 + (state.reputation * 0.15),
+          defense: 0,
+          defenseNextTurn: false
+        };
+
+        this.enemy = {
+          maxHealth: 80 * mult,
+          health: 80 * mult,
+          maxStamina: 85 * mult,
+          stamina: 85 * mult,
+          maxCursedEnergy: 75 * mult,
+          cursedEnergy: 75 * mult,
+          power: 6 * mult,
+          defense: 0,
+          defenseNextTurn: false
+        };
+
+        this.availableMoves = ["divergentFist", "shadowSlash", "defensiveStance", "recover"];
+        if (state.reputation > 30) this.availableMoves.push("dominantBlow");
+        if (state.reputation > 50) this.availableMoves.push("powerBurst");
+      }
+
+      executeMove(moveKey, isPlayer = true) {
+        const move = movesDB[moveKey];
+        const actor = isPlayer ? this.player : this.enemy;
+        const target = isPlayer ? this.enemy : this.player;
+
+        // Check if move is available
+        if (actor.stamina < move.staminaCost || actor.cursedEnergy < move.cursedEnergyCost) {
+          return null;
+        }
+
+        // Deduct costs
+        actor.stamina = clamp(actor.stamina - move.staminaCost, 0, actor.maxStamina);
+        actor.cursedEnergy = clamp(actor.cursedEnergy - move.cursedEnergyCost, 0, actor.maxCursedEnergy);
+
+        let result = {
+          moveName: move.name,
+          actor: isPlayer ? "player" : "enemy",
+          damage: 0,
+          hit: false
+        };
+
+        if (move.isDefensive) {
+          actor.defenseNextTurn = true;
+          result.message = `${isPlayer ? "You" : "Enemy"} took a defensive stance!`;
+          return result;
+        }
+
+        if (move.isHealing) {
+          const heal = Math.round(move.healAmount(actor));
+          actor.stamina = clamp(actor.stamina + heal, 0, actor.maxStamina);
+          result.message = `${isPlayer ? "You" : "Enemy"} recovered ${heal} stamina!`;
+          return result;
+        }
+
+        // Calculate damage
+        if (Math.random() < move.accuracy) {
+          result.hit = true;
+          result.damage = Math.round(move.damage(actor));
+
+          // Apply defense
+          if (target.defenseNextTurn) {
+            result.damage = Math.round(result.damage * (1 - move.defenseBonus || 0.5));
+            result.message = `${isPlayer ? "You" : "Enemy"} used ${move.name} but it was partially blocked! (${result.damage} damage)`;
+            target.defenseNextTurn = false;
+          } else {
+            result.message = `${isPlayer ? "You" : "Enemy"} used ${move.name}! (${result.damage} damage)`;
+          }
+
+          target.health = clamp(target.health - result.damage, 0, target.maxHealth);
+        } else {
+          result.message = `${isPlayer ? "Your" : "Enemy's"} ${move.name} missed!`;
+        }
+
+        return result;
+      }
+
+      enemyAI() {
+        const moves = this.availableMoves.filter(moveKey => {
+          const move = movesDB[moveKey];
+          return this.enemy.stamina >= move.staminaCost && this.enemy.cursedEnergy >= move.cursedEnergyCost;
+        });
+
+        if (moves.length === 0) return null;
+
+        // Simple AI logic
+        if (this.player.health > this.enemy.health * 1.5 && Math.random() < 0.3) {
+          const healMoves = moves.filter(m => movesDB[m].isHealing);
+          if (healMoves.length > 0) return randomFrom(healMoves);
+        }
+
+        if (this.player.health > 70 && Math.random() < 0.2) {
+          const defenseMoves = moves.filter(m => movesDB[m].isDefensive);
+          if (defenseMoves.length > 0) return randomFrom(defenseMoves);
+        }
+
+        return randomFrom(moves);
+      }
+
+      isFinished() {
+        return this.player.health <= 0 || this.enemy.health <= 0;
+      }
+    }
+
+    function startCombat(enemyName, enemyGrade) {
+      combat = new CombatState(state.name, enemyName, enemyGrade);
+      mainScreen.classList.add("hidden");
+      combatScreen.classList.remove("hidden");
+      battleResult.classList.add("hidden");
+      combatLogEl.innerHTML = "";
+
+      addCombatLog(`Battle started against ${enemyName}!`, "neutral");
+      renderCombat();
+    }
+
+    function renderCombat() {
+      // Update health bars
+      const playerHealthPercent = (combat.player.health / combat.player.maxHealth) * 100;
+      const enemyHealthPercent = (combat.enemy.health / combat.enemy.maxHealth) * 100;
+      const playerStaminaPercent = (combat.player.stamina / combat.player.maxStamina) * 100;
+      const enemyStaminaPercent = (combat.enemy.stamina / combat.enemy.maxStamina) * 100;
+      const playerCEPercent = (combat.player.cursedEnergy / combat.player.maxCursedEnergy) * 100;
+      const enemyCEPercent = (combat.enemy.cursedEnergy / combat.enemy.maxCursedEnergy) * 100;
+
+      document.getElementById("playerHealthBar").style.width = playerHealthPercent + "%";
+      document.getElementById("playerHealthText").textContent = `${Math.round(combat.player.health)}/${combat.player.maxHealth}`;
+
+      document.getElementById("enemyHealthBar").style.width = enemyHealthPercent + "%";
+      document.getElementById("enemyHealthText").textContent = `${Math.round(combat.enemy.health)}/${combat.enemy.maxHealth}`;
+
+      document.getElementById("playerStaminaBar").style.width = playerStaminaPercent + "%";
+      document.getElementById("playerStaminaText").textContent = `${Math.round(combat.player.stamina)}/${combat.player.maxStamina}`;
+
+      document.getElementById("enemyStaminaBar").style.width = enemyStaminaPercent + "%";
+      document.getElementById("enemyStaminaText").textContent = `${Math.round(combat.enemy.stamina)}/${combat.enemy.maxStamina}`;
+
+      document.getElementById("playerCEBar").style.width = playerCEPercent + "%";
+      document.getElementById("playerCEText").textContent = `${Math.round(combat.player.cursedEnergy)}/${combat.player.maxCursedEnergy}`;
+
+      document.getElementById("enemyCEBar").style.width = enemyCEPercent + "%";
+      document.getElementById("enemyCEText").textContent = `${Math.round(combat.enemy.cursedEnergy)}/${combat.enemy.maxCursedEnergy}`;
+
+      // Update turn indicator
+      if (!combat.finished) {
+        turnIndicator.textContent = combat.isPlayerTurn ? "Your Turn" : "Enemy Turn";
+      }
+
+      // Update moves
+      renderMoves();
+    }
+
+    function renderMoves() {
+      movesGrid.innerHTML = "";
+
+      combat.availableMoves.forEach(moveKey => {
+        const move = movesDB[moveKey];
+        const canAfford = combat.player.stamina >= move.staminaCost && combat.player.cursedEnergy >= move.cursedEnergyCost;
+
+        const btn = document.createElement("button");
+        btn.className = "move-btn";
+        btn.disabled = !canAfford || !combat.isPlayerTurn || combat.finished;
+        btn.onclick = () => playerMove(moveKey);
+
+        const nameDiv = document.createElement("div");
+        nameDiv.className = "move-name";
+        nameDiv.textContent = move.name;
+
+        const costDiv = document.createElement("div");
+        costDiv.className = "move-cost";
+        costDiv.textContent = `Stamina: ${move.staminaCost} | CE: ${move.cursedEnergyCost}`;
+
+        btn.appendChild(nameDiv);
+        btn.appendChild(costDiv);
+        movesGrid.appendChild(btn);
+      });
+    }
+
+    function playerMove(moveKey) {
+      const result = combat.executeMove(moveKey, true);
+      if (!result) {
+        addCombatLog("Not enough stamina or cursed energy!", "neutral");
+        return;
+      }
+
+      addCombatLog(result.message, "player");
+
+      if (combat.isFinished()) {
+        endCombat();
+        return;
+      }
+
+      combat.isPlayerTurn = false;
+      renderCombat();
+
+      // Enemy turn
+      setTimeout(() => {
+        const enemyMove = combat.enemyAI();
+        if (enemyMove) {
+          const enemyResult = combat.executeMove(enemyMove, false);
+          addCombatLog(enemyResult.message, "enemy");
+        } else {
+          addCombatLog("Enemy couldn't move (insufficient resources)!", "neutral");
+        }
+
+        if (combat.isFinished()) {
+          endCombat();
+          return;
+        }
+
+        combat.isPlayerTurn = true;
+        combat.turn += 1;
+
+        // Restore some resources each turn
+        combat.player.stamina = clamp(combat.player.stamina + 12, 0, combat.player.maxStamina);
+        combat.player.cursedEnergy = clamp(combat.player.cursedEnergy + 8, 0, combat.player.maxCursedEnergy);
+        combat.enemy.stamina = clamp(combat.enemy.stamina + 10, 0, combat.enemy.maxStamina);
+        combat.enemy.cursedEnergy = clamp(combat.enemy.cursedEnergy + 7, 0, combat.enemy.maxCursedEnergy);
+
+        renderCombat();
+      }, 1200);
+    }
+
+    function endCombat() {
+      combat.finished = true;
+      const playerWon = combat.enemy.health <= 0;
+
+      battleResult.classList.remove("hidden");
+      turnIndicator.textContent = playerWon ? "Victory!" : "Defeat...";
+
+      if (playerWon) {
+        battleResult.innerHTML = `
+          <h2 class="good">Victory!</h2>
+          <p>You defeated the ${combat.enemyGrade}!</p>
+        `;
+        addCombatLog("Battle won!", "player");
+        state.reputation += 12;
+        state.money += 40;
+        state.health = clamp(state.health - 15, 0, 100);
+        state.curseEnergy = clamp(state.curseEnergy + 10, 0, 100);
+      } else {
+        battleResult.innerHTML = `
+          <h2 class="bad">Defeat...</h2>
+          <p>You were overwhelmed by the ${combat.enemyGrade}.</p>
+        `;
+        addCombatLog("You were defeated!", "enemy");
+        state.health = clamp(state.health - 30, 0, 100);
+        state.fear = clamp(state.fear + 15, 0, 100);
+      }
+
+      renderCombat();
+
+      setTimeout(() => {
+        const continueBtn = document.createElement("button");
+        continueBtn.textContent = "Return to Main Screen";
+        continueBtn.className = "good";
+        continueBtn.style.marginTop = "16px";
+        continueBtn.onclick = () => {
+          combat = null;
+          combatScreen.classList.add("hidden");
+          mainScreen.classList.remove("hidden");
+          updateUI();
+          checkLife();
+        };
+        movesGrid.appendChild(continueBtn);
+      }, 500);
+    }
+
+    // ============ LIFE EVENTS ============
+    function startFight() {
+      const grades = ["Small Curse", "Grade 2", "Grade 1"];
+      const grade = randomFrom(grades);
+      startCombat(`${grade} Curse`, grade);
+    }
+
+    function startMission() {
+      const grade = Math.random() < 0.6 ? "Grade 2" : Math.random() < 0.8 ? "Grade 1" : "Special Grade";
+      startCombat(`Mission: ${grade} Curse`, grade);
+    }
+
+    function train() {
+      const gain = randomFrom([8, 12, 15]);
+      state.curseEnergy = clamp(state.curseEnergy + gain, 0, 100);
+      state.energy = clamp(state.energy - 15, 0, 100);
+      state.health = clamp(state.health - 6, 0, 100);
+      state.reputation += 5;
+      state.fear = clamp(state.fear + 2, 0, 100);
+
+      story("<strong>Training session:</strong> You push your cursed energy further, sharpening instinct and control. The pressure of every strike is overwhelming but you feel stronger.");
+      addLog("You trained hard and improved your cursed energy.", "good");
+
+      if (Math.random() < 0.35) {
+        const enemy = randomFrom(["Grade 2 curse", "Special grade curse", "Cursed user"]);
+        startCombat(enemy, enemy.includes("Special") ? "Special Grade" : "Grade 2");
+        return;
+      }
+
+      nextYear();
+      updateUI();
+      checkLife();
+    }
+
+    function study() {
+      const gain = randomFrom([4, 7, 9]);
+      state.grade = ["D", "C", "B", "A", "S"][Math.min(Math.max(0, Math.floor((state.reputation + gain) / 15)), 4)];
+      state.money = clamp(state.money + 5, 0, 10000);
+      state.energy = clamp(state.energy - 8, 0, 100);
+      state.reputation += 3;
+
+      story("<strong>Study time:</strong> You review cursed techniques, shikigami theory, and battlefield tactics. Your discipline grows stronger.");
+      addLog("You studied and improved your academic standing.", "good");
+
+      nextYear();
+      updateUI();
+    }
+
+    function rest() {
+      state.health = clamp(state.health + 18, 0, 100);
+      state.energy = clamp(state.energy + 25, 0, 100);
+      state.curseEnergy = clamp(state.curseEnergy + 5, 0, 100);
+
+      story("<strong>Rest.</strong> You recover at the dorms, gathering your strength and adjusting to the reality of your new life.");
+      addLog("You rested and recovered some stamina.", "good");
+
+      updateUI();
+    }
+
+    function eat() {
+      state.health = clamp(state.health + 12, 0, 100);
+      state.energy = clamp(state.energy + 10, 0, 100);
+
+      story("<strong>Meal break:</strong> A proper meal restores your body and calms your mind before the next challenge.");
+      addLog("You ate and recovered a bit of health.", "good");
+
+      updateUI();
+    }
+
+    function socialize() {
+      const options = [
+        "You meet Megumi and talk strategy by the training field.",
+        "You joke around with Nobara and improve your morale.",
+        "You spend time with Yuji's friends and build new bonds.",
+        "You learn a little more about Gojo's unusual lessons."
+      ];
+      const event = randomFrom(options);
+
+      state.reputation += 4;
+      state.energy = clamp(state.energy - 5, 0, 100);
+      state.fear = clamp(state.fear - 5, 0, 100);
+
+      story(`<strong>Social time:</strong> ${event}`);
+      addLog("You socialized and bolstered your reputation.", "good");
+
+      updateUI();
+    }
+
+    function shop() {
+      story("<strong>Jujutsu supply shop:</strong> You buy bandages, cursed energy pills, and training gear. Your readiness improves.");
+      state.money = clamp(state.money - 30, 0, 10000);
+      state.health = clamp(state.health + 8, 0, 100);
+      state.energy = clamp(state.energy + 6, 0, 100);
+      state.curseEnergy = clamp(state.curseEnergy + 6, 0, 100);
+      addLog("You bought supplies for your next battle.", "good");
+      updateUI();
+    }
+
+    // Initialize
+    updateUI();
+    addLog("Your story begins at Tokyo Jujutsu High.", "good");
+  </script>
+</body>
+</html>
